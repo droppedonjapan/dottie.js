@@ -24,6 +24,22 @@
 		}
 	};
 
+	var _extend;
+	if( !!Object.defineProperty ) {
+		_extend = function(key, value) {
+			Object.defineProperty((Object.prototype || Object), value, {
+				configurable: true,
+				enumerable: false,
+				value: Dottie[key],
+				writable: true
+			});
+		};
+	} else {
+		_extend = function(key, value) {
+			Object[value] = Dottie[key];
+		};
+	}
+
 	var Dottie = function() {
 		var args = Array.prototype.slice.call(arguments);
 
@@ -153,6 +169,24 @@
 
 		return flattened;
 	}
+
+	Dottie.extend = function(object) {
+		object = object || {};
+
+		var defaultObject = {
+			'get' : '$get',
+			'set' : '$set',
+			'transform' : '$transform'
+		};
+
+		for( var key in object ) {
+			if( typeof object[key] == 'string' && !!defaultObject[key] ) defaultObject[key] = object[key];
+		}
+
+		for( var key in defaultObject ) {
+			if( defaultObject.hasOwnProperty(key) ) _extend(key, defaultObject[key]);
+		}
+	};
 
 	if (typeof module !== 'undefined' && module.exports) {
 		exports = module.exports = Dottie;
